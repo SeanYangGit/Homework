@@ -134,6 +134,202 @@ private:
 	int Capacity = 0;
 };
 
+template<class T>
+struct LinkNode
+{
+public:
+	T value;
+	LinkNode* Per;
+	LinkNode* Next;
+
+public:
+	LinkNode(){}
+	LinkNode(T InValue, LinkNode* InPer, LinkNode* InNext)
+	{
+		value = InValue;
+		Per = InPer;
+		Next = InNext
+	}
+};
+
+template<class T>
+class DoubleLink
+{
+public:
+	DoubleLink();
+	~DoubleLink();
+
+	int Size();
+	int Is_Empty();
+
+
+	T Get(int InIndex);
+	T Get_First();
+	T Get_Last();
+
+	LinkNode<T>* Insert(int InIndex, T InValue);
+	LinkNode<T>* Insert_First(T InValue);
+	LinkNode<T>* Append_Last(T InValue);
+
+	void DeleteItem(int InIndex);
+	void DeleteItem_First();
+	void DeleteItem_Last();
+
+private:
+	int Count;
+	LinkNode<T>* HeadPtr = nullptr;
+
+private:
+	LinkNode<T>* Get_Node(int InIndex);
+};
+
+template<class T>
+DoubleLink::DoubleLink():Count(0)
+{
+	HeadPtr = new LinkNode<T>();
+	HeadPtr->Per = HeadPtr->Next = HeadPtr;
+}
+
+template<class T>
+DoubleLink::~DoubleLink()
+{
+	LinkNode<T>* TempPtr = nullptr;
+	LinkNode<T>* NodePtr = HeadPtr->Next;
+
+	while (NodePtr != HeadPtr)
+	{
+		TempPtr = NodePtr;
+		NodePtr = NodePtr->Next;
+		delete TempPtr;
+	}
+
+	delete HeadPtr;
+	HeadPtr = nullptr;
+}
+
+template<class T>
+LinkNode<T>* DoubleLink<T>::Get_Node(int InIndex)
+{
+	if (InIndex < 0 || InIndex >= Count)
+	{
+		count << "Can not find node by index!!!" << endl;
+		return nullptr;
+	}
+
+	if (InIndex <= Count / 2)
+	{
+		int i = 0;
+		LinkNode<T>* IndexNodePtr = HeadPtr->Next;
+		while (i++ < InIndex)
+		{
+			IndexNodePtr = IndexNodePtr->Next;
+		}
+
+		return IndexNodePtr;
+	}
+
+	int i = 0;
+	int RIndex = Count - InIndex - 1;
+	LinkNode<T>* IndexNodePtr = HeadPtr->Per;
+	while (i++ < RIndex)
+	{
+		IndexNodePtr = IndexNodePtr->Per;
+	}
+
+	return IndexNodePtr;
+}
+
+template<class T>
+void DoubleLink<T>::DeleteItem_Last()
+{
+	DeleteItem(Count - 1);
+}
+
+template<class T>
+void DoubleLink<T>::DeleteItem_First()
+{
+	DeleteItem(0);
+}
+
+template<class T>
+void DoubleLink<T>::DeleteItem(int InIndex)
+{
+	LinkNode<T>* IndexNodePtr = Get_Node(InIndex);
+	IndexNodePtr->Next->Per = IndexNodePtr->Per;
+	IndexNodePtr->Per->Next = IndexNodePtr->Next;
+	delete IndexNodePtr;
+	Count--;
+}
+
+template<class T>
+LinkNode<T>* DoubleLink<T>::Append_Last(T InValue)
+{
+	LinkNode NewNodePtr = new LinkNode<T>(InValue, HeadPtr->Per, HeadPtr);
+	HeadPtr->Per->Next = NewNodePtr;
+	HeadPtr->Per = NewNodePtr;
+	Count++;
+	return NewNodePtr;
+}
+
+template<class T>
+LinkNode<T>* DoubleLink<T>::Insert_First(T InValue)
+{
+	LinkNode<T>* NewNodePtr = new LinkNode<T>(InValue, HeadPtr, HeadPtr->Next);
+	HeadPtr->Next->Per = NewNodePtr;
+	HeadPtr->Next = NewNodePtr;
+	count++;
+	return NewNodePtr;
+}
+
+template<class T>
+LinkNode<T>* DoubleLink<T>::Insert(int InIndex, T InValue)
+{
+	if (InIndex == 0)
+	{
+		return Insert_First(InValue);
+	}
+
+	LinkNode<T>* IndexNodePtr = Get_Node(InIndex);
+	LinkNode<T>* NewNodePtr = new LinkNode<T>(InValue, IndexNodePtr->Per, IndexNodePtr->Next);
+
+	IndexNodePtr->Per->Next = NewNodePtr;
+	IndexNodePtr->Per = NewNodePtr;
+
+	Count++;
+	return NewNodePtr;
+}
+
+template<class T>
+T DoubleLink<T>::Get_Last()
+{
+	return Get(Count - 1);
+}
+
+template<class T>
+T DoubleLink<T>::Get_First()
+{
+	return Get(0);
+}
+
+template<class T>
+T DoubleLink<T>::Get(int InIndex)
+{
+	auto NodePtr = Get_Node(InIndex);
+
+	return NodePtr != nullptr ? NodePtr->value : T();
+}
+
+template<class T>
+int DoubleLink<T>::Is_Empty()
+{
+	return Count == 0;
+}
+
+template<class T>
+int DoubleLink<T>::Size()
+{
+	return Count;
+}
 
 int main()
 {
@@ -146,4 +342,12 @@ int main()
 	arr->Pop<float>();
 	arr->Clear<float>();
 	int index = arr->FindIndex<float>(1);
+
+	auto list1 = new DoubleLink<int>();
+	auto node1 = list1->Insert_First(1);
+	auto node2 = list1->Insert_First(2);
+	auto node3 = list1->Insert(2, 3);
+	auto ret = list1->Get(2);
+	list1->DeleteItem(2);
+
 }
