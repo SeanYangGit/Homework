@@ -2,8 +2,7 @@
 //
 
 #include <iostream>
-
-#define DOUBLE_EXPAND_SIZE = 1024;
+#include<stdio.h>
 
 template<class T>
 class RingBuffer
@@ -33,9 +32,9 @@ public:
 	{
 		if (IsFull())
 		{
-			return false;
+			Expand();
 		}
-		Data[Rear] = value;
+		Data[Rear] = InValue;
 		Rear = (Rear + 1) % Size;
 
 		return true;
@@ -50,6 +49,8 @@ public:
 
 		InValue = Data[Front];
 		Front = (Front + 1) % Size;
+
+		reduce();
 		return true;
 	}
 
@@ -65,8 +66,8 @@ public:
 private:
 	void Expand()
 	{
-		Size = Size * 2 <= DOUBLE_EXPAND_SIZE ? Size * 2 : Size * 1.25;
-		T* NewData = new T[Size];
+		unsigned int PerSize = (Size * 2) < 1024 ? (unsigned int)(Size * 2) : (unsigned int)(Size * 1.25f);
+		T* NewData = new T[PerSize];
 
 		for (int i = 0; i < Size; i++)
 		{
@@ -75,14 +76,36 @@ private:
 
 		delete[]Data;
 		Data = NewData;
+
+		Size = PerSize;
 	}
 
 	void reduce()
 	{
-		if ((Rear - Front) > Size / 2)
+		unsigned int PerSize = Size / 2;
+
+		if ((Rear - Front) >= PerSize)
 		{
 			return;
 		}
+
+		Size = PerSize;
+
+		T* NewData = new T[Size];
+
+		int i = 0;
+
+		for (int ii = Front; ii <= Rear; ii++)
+		{
+			NewData[i] = Data[ii];
+			i++;
+		}
+
+		Front = 0;
+		Rear = i - 1;
+
+		delete[]Data;
+		Data = NewData;
 	}
 private:
 	unsigned int Size;
@@ -94,5 +117,22 @@ private:
 
 int main()
 {
-    std::cout << "Hello World!\n";
+	int initSize = 256;
+	const char* data = "123456789";
+	auto buffer = new RingBuffer<char>(initSize);
+	srand(1);
+	for (int ii = 0; ii < 1000; ii++)
+	{
+		int pushCount = rand() % 10;
+
+		for (int jj = 0; jj < pushCount; jj++)
+		{
+			char temp = jj + '0';
+			buffer->Push(temp);    // 要支持自动扩容
+		}
+
+		char temp = '0';
+		int popCount = rand() % 10;
+		for (int jj = 0; jj < popCount; jj++) buffer->Pop(temp);   // 要支持自动缩容
+	}
 }
