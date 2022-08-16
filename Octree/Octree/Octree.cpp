@@ -277,7 +277,7 @@ bool IsPointInBox(const KPoint& InPoint, const KPoint& InMin, const KPoint& InMa
 int main()
 {
 	std::vector<KPoint> TestPoints;
-	for (int i = 0; i < 500; i++)
+	for (int i = 0; i < 20; i++)
 	{
 		TestPoints.push_back(RnadPoint(0.0f,99.0f));
 	}
@@ -289,7 +289,7 @@ int main()
 
 	int InBoxCount = 0;
 
-	for (int i = 0; i < 500; i++)
+	for (int i = 0; i < 20; i++)
 	{
 		if (IsPointInBox(TestPoints[i], MinPoint, MaxPoint))
 		{
