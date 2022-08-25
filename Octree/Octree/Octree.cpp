@@ -73,7 +73,7 @@ public:
 
 	bool IsHasChildren() { return ChildrenNode[0] != nullptr; }
 
-	bool IsInSlef(const KPoint& point)
+	bool IsInSelf(const KPoint& point)
 	{
 		return
 			point.GetX() > CenterPoint.GetX() - Depth/2.0f &&
@@ -91,7 +91,7 @@ public:
 		{
 			for (int i = 0; i < 8; i++)
 			{
-				if (ChildrenNode[i] != nullptr && ChildrenNode[i] - IsInSlef(point))
+				if (ChildrenNode[i] != nullptr && ChildrenNode[i] - IsInSelf(point))
 				{
 					ChildrenNode[i]->insert(point);
 				}
@@ -186,7 +186,7 @@ public:
 							break;
 						}
 
-						if (ChildrenNode[i] != nullptr && ChildrenNode[i] - IsInSlef(point))
+						if (ChildrenNode[i] != nullptr && ChildrenNode[i] - IsInSelf(point))
 						{
 							ChildrenNode[i]->insert(point);
 
@@ -195,7 +195,7 @@ public:
 							continue;
 						}
 
-						if (ChildrenNode[i] != nullptr && ChildrenNode[i] - IsInSlef(DataPoint))
+						if (ChildrenNode[i] != nullptr && ChildrenNode[i] - IsInSelf(DataPoint))
 						{
 							ChildrenNode[i]->insert(DataPoint);
 							SearchCount++;
